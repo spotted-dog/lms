@@ -4,8 +4,12 @@ import com.acme.lms.model.Course;
 import com.acme.lms.model.Student;
 import com.acme.lms.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -44,5 +48,15 @@ public class StudentController {
   @DeleteMapping("/students/{studentId}")
   public void deleteStudent(@PathVariable String studentId) {
     studentService.deleteStudent(studentId);
+  }
+
+  @PostMapping("/student")
+  public ResponseEntity<Void> addStudent(@RequestBody Student student, UriComponentsBuilder builder) {
+    studentService.addStudent(student);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setLocation(builder.path("/students/{studentId}").buildAndExpand(student.getId()).toUri());
+
+    return new ResponseEntity<>(headers, HttpStatus.CREATED);
   }
 }

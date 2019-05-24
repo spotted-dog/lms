@@ -73,4 +73,14 @@ public class StudentService {
   public void deleteStudent(String studentId) {
     studentRepository.deleteById(studentId);
   }
+
+  public synchronized void addStudent(Student student) {
+    Optional<Student> studentById = studentRepository.findById(student.getId());
+
+    if (studentById.isPresent()) {
+      return;
+    }
+
+    studentRepository.save(student);
+  }
 }
