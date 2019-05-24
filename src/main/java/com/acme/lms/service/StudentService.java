@@ -2,68 +2,58 @@ package com.acme.lms.service;
 
 import com.acme.lms.model.Course;
 import com.acme.lms.model.Student;
-import org.springframework.stereotype.Component;
+import com.acme.lms.repository.StudentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-@Component
+@Service
 public class StudentService {
-  private static List<Student> students = new ArrayList<>();
-
-  static {
-    // initialize data
-    Course codeOfConduct = new Course("COC101", "Code of Conduct 101", "Detailed CoC Information");
-    Course exportImport = new Course("EXIM101", "Export/Import 101", "Basic rules of ExIm");
-    Course ergonomics= new Course("EGRO101", "Ergonomics 101", "Office desk setup");
-
-    Student mikeSmith = new Student("1122345", "Mike Smith");
-    Student johnCatrone = new Student("1133456", "John Catrone");
-
-    mikeSmith.getRegistrations().add(codeOfConduct);
-    mikeSmith.getRegistrations().add(ergonomics);
-
-    johnCatrone.getRegistrations().add(codeOfConduct);
-    johnCatrone.getRegistrations().add(exportImport);
-
-    students.add(mikeSmith);
-    students.add(johnCatrone);
-  }
+  @Autowired
+  private StudentRepository studentRepository;
 
   public List<Student> retrieveAllStudents() {
+    Iterable<Student> all = studentRepository.findAll();
+    List<Student> students = new ArrayList<>();
+
+    all.forEach(student -> students.add(student));
+
     return students;
   }
 
   public Student retrieveStudent(String studentId) {
-    for (Student student: students) {
-      if (student.getId().equals(studentId)) {
-        return student;
-      }
+    Optional<Student> studentById = studentRepository.findById(studentId);
+
+    return studentById.isPresent() ? studentById.get() : null;
+  }
+
+  public List<Course> retrieveCourses(String studentId) {
+    Optional<Student> studentById = studentRepository.findById(studentId);
+
+    if (studentById.isPresent()) {
+      Student student = studentById.get();
+      List<Course> courses = student.getRegistrations();
+
+      return courses;
     }
 
     return null;
   }
 
-  public List<Course> retrieveCourses(String studentId) {
-    Student student = retrieveStudent(studentId);
-
-    if (student == null) {
-      return null;
-    }
-
-    return student.getRegistrations();
-  }
-
   public Course retrieveCourse(String studentId, String courseId) {
-    Student student = retrieveStudent(studentId);
+    Optional<Student> studentById = studentRepository.findById(studentId);
 
-    if (student == null) {
-      return null;
-    }
+    if (studentById.isPresent()) {
+      Student student = studentById.get();
+      List<Course> courses = student.getRegistrations();
 
-    for (Course course: student.getRegistrations()) {
-      if (course.getId().equals(courseId)) {
-        return course;
+      for (Course course : courses) {
+        if (course.getId().equals(courseId)) {
+          return course;
+        }
       }
     }
 
@@ -71,12 +61,16 @@ public class StudentService {
   }
 
   public void addCourse(String studentId, Course course) {
-    Student student = retrieveStudent(studentId);
+    Optional<Student> studentById = studentRepository.findById(studentId);
 
-    if (student == null) {
-      return;
+    if (studentById.isPresent()) {
+      Student student = studentById.get();
+
+      student.getRegistrations().add(course);
     }
+  }
 
-    student.getRegistrations().add(course);
+  public void deleteStudent(String studentId) {
+    studentRepository.deleteById(studentId);
   }
 }

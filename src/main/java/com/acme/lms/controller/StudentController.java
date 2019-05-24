@@ -40,4 +40,9 @@ public class StudentController {
 
     return ResponseEntity.noContent().build();
   }
+
+  @DeleteMapping("/students/{studentId}")
+  public void deleteStudent(@PathVariable String studentId) {
+    studentService.deleteStudent(studentId);
+  }
 }

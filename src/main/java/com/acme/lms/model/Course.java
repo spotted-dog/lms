@@ -2,10 +2,7 @@ package com.acme.lms.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -19,9 +16,6 @@ public class Course {
   @NotNull
   private String description;
 
-  @ManyToMany(mappedBy = "registrations")
-  private List<Student> registrations;
-
   public Course() {
   }
 
@@ -29,7 +23,6 @@ public class Course {
     this.id = id;
     this.name = name;
     this.description = description;
-    this.registrations = new ArrayList<>();
 
   }
 
@@ -57,36 +50,9 @@ public class Course {
     this.description = description;
   }
 
-  public List<Student> getRegistrations() {
-    return registrations;
-  }
-
-  public void setRegistrations(List<Student> registrations) {
-    this.registrations = registrations;
-  }
-
   @Override
   public String toString() {
-    String course = "{ \"id\": \"" + getId() + "\"" +
-        ", \"name\": \"" + getName() + "\"" +
-        ", \"description\": \"" + getDescription() + "\"" +
-        ", \"students\": [ ";
-
-    int numberOfStudents = getRegistrations().size();
-    Student lastStudent = numberOfStudents > 1 ? registrations.get(numberOfStudents - 1) : null;
-    StringBuilder result = new StringBuilder(course);
-
-    for (Student student : registrations) {
-      result.append(student.toString());
-
-      if ((numberOfStudents > 1) && (student != lastStudent)) {
-        result.append(", ");
-      }
-    }
-
-    result.append(" ] }");
-
-    return result.toString();
+    return String.format("{ \"id\": \"%s\", \"name\": \"%s\", \"description\": \"%s\" }");
   }
 
   @Override
