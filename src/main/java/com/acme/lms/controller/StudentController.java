@@ -17,6 +17,21 @@ public class StudentController {
   @Autowired
   private StudentService studentService;
 
+  @PostMapping("/student")
+  public ResponseEntity<Void> addStudent(@RequestBody Student student, UriComponentsBuilder builder) {
+    studentService.addStudent(student);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setLocation(builder.path("/students/{studentId}").buildAndExpand(student.getId()).toUri());
+
+    return new ResponseEntity<>(headers, HttpStatus.CREATED);
+  }
+
+  @DeleteMapping("/students/{studentId}")
+  public void deleteStudent(@PathVariable String studentId) {
+    studentService.deleteStudent(studentId);
+  }
+
   @GetMapping("/students")
   public List<Student> retrieveAllStudents() {
     return studentService.retrieveAllStudents();
@@ -42,20 +57,5 @@ public class StudentController {
     studentService.addCourse(studentId, newCourse);
 
     return ResponseEntity.noContent().build();
-  }
-
-  @DeleteMapping("/students/{studentId}")
-  public void deleteStudent(@PathVariable String studentId) {
-    studentService.deleteStudent(studentId);
-  }
-
-  @PostMapping("/student")
-  public ResponseEntity<Void> addStudent(@RequestBody Student student, UriComponentsBuilder builder) {
-    studentService.addStudent(student);
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(builder.path("/students/{studentId}").buildAndExpand(student.getId()).toUri());
-
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
   }
 }

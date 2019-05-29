@@ -15,6 +15,24 @@ public class StudentService {
   @Autowired
   private StudentRepository studentRepository;
 
+  public synchronized void addStudent(Student student) {
+    Optional<Student> studentById = studentRepository.findById(student.getId());
+
+    if (studentById.isPresent()) {
+      return;
+    }
+
+    studentRepository.save(student);
+  }
+
+  public void deleteStudent(String studentId) {
+    Optional<Student> studentById = studentRepository.findById(studentId);
+
+    if (studentById.isPresent()) {
+      studentRepository.deleteById(studentId);
+    }
+  }
+
   public List<Student> retrieveAllStudents() {
     Iterable<Student> all = studentRepository.findAll();
     List<Student> students = new ArrayList<>();
@@ -68,19 +86,5 @@ public class StudentService {
 
       student.getRegistrations().add(course);
     }
-  }
-
-  public void deleteStudent(String studentId) {
-    studentRepository.deleteById(studentId);
-  }
-
-  public synchronized void addStudent(Student student) {
-    Optional<Student> studentById = studentRepository.findById(student.getId());
-
-    if (studentById.isPresent()) {
-      return;
-    }
-
-    studentRepository.save(student);
   }
 }
