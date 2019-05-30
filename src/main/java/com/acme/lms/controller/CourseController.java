@@ -31,7 +31,7 @@ public class CourseController {
     courseService.deleteCourse(courseId);
   }
 
-  @GetMapping("/course")
+  @GetMapping("/courses")
   public List<Course> retrieveAllCourse() {
     return courseService.retrieveAllCourses();
   }
